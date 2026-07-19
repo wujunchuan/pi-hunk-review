@@ -1,6 +1,6 @@
 {
   "name": "pi-hunk-review",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Bridge Pi and live Hunk review sessions with review, fix, and status commands.",
   "type": "module",
   "keywords": [
