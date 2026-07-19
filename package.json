@@ -1,0 +1,54 @@
+{
+  "name": "pi-hunk-review",
+  "version": "0.1.0",
+  "description": "Bridge Pi and live Hunk review sessions with review, fix, and status commands.",
+  "type": "module",
+  "keywords": [
+    "pi-package",
+    "pi",
+    "pi-extension",
+    "hunk",
+    "git",
+    "code-review"
+  ],
+  "license": "MIT",
+  "author": "John Trump <wujunchuan2008@gmail.com>",
+  "engines": {
+    "node": ">=20"
+  },
+  "pi": {
+    "extensions": [
+      "./src/index.ts"
+    ]
+  },
+  "scripts": {
+    "check": "tsc --noEmit",
+    "test": "node --import tsx --test test/*.test.ts",
+    "validate": "npm run check && npm test"
+  },
+  "peerDependencies": {
+    "@earendil-works/pi-coding-agent": "*"
+  },
+  "devDependencies": {
+    "@earendil-works/pi-coding-agent": "^0.80.7",
+    "@types/node": "^24.0.0",
+    "tsx": "^4.20.0",
+    "typescript": "^5.8.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wujunchuan/pi-hunk-review.git"
+  },
+  "bugs": {
+    "url": "https://github.com/wujunchuan/pi-hunk-review/issues"
+  },
+  "homepage": "https://github.com/wujunchuan/pi-hunk-review#readme",
+  "files": [
+    "src/**/*.ts",
+    "README.md",
+    "LICENSE"
+  ],
+  "publishConfig": {
+    "access": "public"
+  }
+}
