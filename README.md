@@ -26,13 +26,19 @@ npm i -g hunkdiff
 
 ## Install
 
-From a local checkout:
+Install from npm:
 
 ```bash
-pi install /absolute/path/to/pi-hunk-review
+pi install npm:pi-hunk-review
 ```
 
-Or try it without changing Pi settings:
+Or install directly from GitHub:
+
+```bash
+pi install git:github.com/wujunchuan/pi-hunk-review
+```
+
+For local development, try the checkout without changing Pi settings:
 
 ```bash
 cd /absolute/path/to/pi-hunk-review
@@ -112,9 +118,10 @@ MIT
 - `/hunk-fix`：读取 Hunk 中的人工和 Agent 评论，修改代码并运行检查
 - `/hunk-status`：检查当前仓库是否连接了 Hunk 会话
 
-Hunk 需要运行在另一个终端：
+安装插件并在另一个终端启动 Hunk：
 
 ```bash
+pi install npm:pi-hunk-review
 hunk diff --watch
 ```
 
