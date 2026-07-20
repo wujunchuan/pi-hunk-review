@@ -1,6 +1,10 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { buildFixPrompt, buildReviewPrompt } from "../src/prompts.ts";
+import {
+	buildFixPrompt,
+	buildReviewPrompt,
+	parsePromptArgs,
+} from "../src/prompts.ts";
 
 test("review prompt targets the repo and requests inline comments without edits", () => {
 	const prompt = buildReviewPrompt({ cwd: "/tmp/example" });
@@ -30,4 +34,37 @@ test("extra instructions are trimmed and appended", () => {
 		prompt,
 		/Additional user instructions:\nReview only src\/auth\.ts\.$/,
 	);
+});
+
+test("language codes are parsed from the first argument", () => {
+	assert.deepEqual(parsePromptArgs("zh"), {
+		outputLanguage: "Simplified Chinese",
+		extraInstructions: undefined,
+	});
+	assert.deepEqual(parsePromptArgs(" ZH-TW  Focus on auth. "), {
+		outputLanguage: "Traditional Chinese",
+		extraInstructions: "Focus on auth.",
+	});
+});
+
+test("unrecognized first arguments remain additional instructions", () => {
+	assert.deepEqual(parsePromptArgs("security only"), {
+		extraInstructions: "security only",
+	});
+});
+
+test("output language applies after potentially conflicting extra instructions", () => {
+	const prompt = buildReviewPrompt({
+		cwd: "/tmp/example",
+		outputLanguage: "Simplified Chinese",
+		extraInstructions: "Respond in English.",
+	});
+
+	assert.match(prompt, /Hunk comment summaries and rationales/);
+	assert.match(prompt, /final report/);
+	assert.ok(
+		prompt.indexOf("Additional user instructions:\nRespond in English.") <
+			prompt.indexOf("Output language: Simplified Chinese"),
+	);
+	assert.match(prompt, /quoted command output unchanged\.$/);
 });

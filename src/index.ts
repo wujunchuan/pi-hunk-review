@@ -4,7 +4,12 @@ import type {
 	ExtensionCommandContext,
 	ExtensionContext,
 } from "@earendil-works/pi-coding-agent";
-import { buildFixPrompt, buildReviewPrompt } from "./prompts.ts";
+import {
+	buildFixPrompt,
+	buildReviewPrompt,
+	OUTPUT_LANGUAGE_NAMES,
+	parsePromptArgs,
+} from "./prompts.ts";
 
 const COMMAND_TIMEOUT_MS = 5_000;
 const STATUS_KEY = "pi-hunk-review";
@@ -87,6 +92,20 @@ export async function probeHunkSession(pi: ExtensionAPI, cwd: string): Promise<P
 	}
 }
 
+function completeOutputLanguage(prefix: string) {
+	const normalized = prefix.trimStart().toLowerCase();
+	if (/\s/.test(normalized)) return null;
+
+	const matches = Object.entries(OUTPUT_LANGUAGE_NAMES)
+		.filter(([code]) => code.startsWith(normalized))
+		.map(([code, language]) => ({
+			value: code,
+			label: code,
+			description: language,
+		}));
+	return matches.length > 0 ? matches : null;
+}
+
 function updateStatus(ctx: ExtensionContext, probe: ProbeResult): void {
 	const label = {
 		connected: "hunk: connected",
@@ -153,26 +172,22 @@ export default function hunkReviewExtension(pi: ExtensionAPI) {
 	});
 
 	pi.registerCommand("hunk-review", {
-		description: "Review the live Hunk diff and publish findings as inline comments",
+		description:
+			"Review the live Hunk diff and publish findings as inline comments; optionally start with a language code",
+		getArgumentCompletions: completeOutputLanguage,
 		handler: async (args, ctx) => {
 			if (!(await requireLiveSession(pi, ctx))) return;
-			sendAgentTask(
-				pi,
-				ctx,
-				buildReviewPrompt({ cwd: ctx.cwd, extraInstructions: args }),
-			);
+			sendAgentTask(pi, ctx, buildReviewPrompt({ cwd: ctx.cwd, ...parsePromptArgs(args) }));
 		},
 	});
 
 	pi.registerCommand("hunk-fix", {
-		description: "Read Hunk comments, apply valid fixes, and run focused checks",
+		description:
+			"Read Hunk comments, apply valid fixes, and run focused checks; optionally start with a language code",
+		getArgumentCompletions: completeOutputLanguage,
 		handler: async (args, ctx) => {
 			if (!(await requireLiveSession(pi, ctx))) return;
-			sendAgentTask(
-				pi,
-				ctx,
-				buildFixPrompt({ cwd: ctx.cwd, extraInstructions: args }),
-			);
+			sendAgentTask(pi, ctx, buildFixPrompt({ cwd: ctx.cwd, ...parsePromptArgs(args) }));
 		},
 	});
 }

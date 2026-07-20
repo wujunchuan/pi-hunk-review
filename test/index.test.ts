@@ -106,11 +106,13 @@ test("hunk-review command probes the session and sends a constrained task", asyn
 	} as unknown as ExtensionCommandContext;
 
 	hunkReviewExtension(pi);
-	await commands.get("hunk-review")?.handler("Focus on auth.", ctx);
+	await commands.get("hunk-review")?.handler("zh Focus on auth.", ctx);
 
 	assert.deepEqual([...commands.keys()], ["hunk-status", "hunk-review", "hunk-fix"]);
 	assert.deepEqual(statuses, ["hunk: connected"]);
 	assert.equal(sent.length, 1);
 	assert.match(sent[0] ?? "", /Do not modify project files/);
+	assert.match(sent[0] ?? "", /Output language: Simplified Chinese/);
 	assert.match(sent[0] ?? "", /Additional user instructions:\nFocus on auth\./);
+	assert.doesNotMatch(sent[0] ?? "", /Additional user instructions:\nzh/);
 });
